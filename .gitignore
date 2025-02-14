@@ -133,8 +133,6 @@ dmypy.json
 
 db_data/*
 !db_data/.gitkeep
-dataset/*
-
 cvat/
 
 data/*

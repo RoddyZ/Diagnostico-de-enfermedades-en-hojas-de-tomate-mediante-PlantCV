@@ -10,8 +10,10 @@ def train_model(model, train_loader, valid_loader, num_epochs=10, learning_rate=
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     
     for epoch in range(num_epochs):
+        # Entrenamiento
         model.train()
-        running_loss = 0.0
+        running_train_loss = 0.0
+        correct_train, total_train = 0, 0
         
         for images, labels in train_loader:
             images, labels = images.to(device), labels.to(device)
@@ -22,22 +24,38 @@ def train_model(model, train_loader, valid_loader, num_epochs=10, learning_rate=
             loss.backward()
             optimizer.step()
             
-            running_loss += loss.item()
+            running_train_loss += loss.item()
+            
+            # Calcular precisión de entrenamiento
+            _, predicted = torch.max(outputs, 1)
+            total_train += labels.size(0)
+            correct_train += (predicted == labels).sum().item()
         
-        avg_train_loss = running_loss / len(train_loader)
+        avg_train_loss = running_train_loss / len(train_loader)
+        train_accuracy = 100 * correct_train / total_train
         
         # Evaluación en el conjunto de validación
         model.eval()
-        correct, total = 0, 0
+        running_valid_loss = 0.0
+        correct_valid, total_valid = 0, 0
+        
         with torch.no_grad():
             for images, labels in valid_loader:
                 images, labels = images.to(device), labels.to(device)
                 outputs = model(images)
+                loss = criterion(outputs, labels)
+                running_valid_loss += loss.item()
+                
+                # Calcular precisión de validación
                 _, predicted = torch.max(outputs, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
+                total_valid += labels.size(0)
+                correct_valid += (predicted == labels).sum().item()
         
-        accuracy = 100 * correct / total
-        print(f"Epoch {epoch+1}/{num_epochs} - Loss: {avg_train_loss:.4f} - Accuracy: {accuracy:.2f}%")
+        avg_valid_loss = running_valid_loss / len(valid_loader)
+        valid_accuracy = 100 * correct_valid / total_valid
+        
+        print(f"Epoch {epoch+1}/{num_epochs} - "
+              f"Train Loss: {avg_train_loss:.4f} - Train Accuracy: {train_accuracy:.2f}% - "
+              f"Valid Loss: {avg_valid_loss:.4f} - Valid Accuracy: {valid_accuracy:.2f}%")
     
     return model
