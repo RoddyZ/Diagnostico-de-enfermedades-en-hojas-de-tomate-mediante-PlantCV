@@ -1,6 +1,45 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
+import os
+import shutil
+import random
+
+def create_test_set(train_dir, test_dir, percentage=10):
+    """
+    Mueve un porcentaje de imágenes de cada clase en train a test, manteniendo la estructura de carpetas.
+    :param train_dir: Ruta de la carpeta train.
+    :param test_dir: Ruta de la carpeta test.
+    :param percentage: Porcentaje de imágenes a mover (por defecto, 10%).
+    """
+    train_dir = os.path.abspath(train_dir)
+    test_dir = os.path.abspath(test_dir)
+    
+    if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
+    
+    for class_folder in os.listdir(train_dir):
+        class_path_train = os.path.join(train_dir, class_folder)
+        class_path_test = os.path.join(test_dir, class_folder)
+        
+        if not os.path.isdir(class_path_train):
+            continue  # Saltar archivos que no sean carpetas
+        
+        if not os.path.exists(class_path_test):
+            os.makedirs(class_path_test)
+        
+        images = [img for img in os.listdir(class_path_train) if os.path.isfile(os.path.join(class_path_train, img))]
+        num_to_move = int(len(images) * (percentage / 100))
+        images_to_move = random.sample(images, num_to_move)
+        
+        for image in images_to_move:
+            src_path = os.path.join(class_path_train, image)
+            dest_path = os.path.join(class_path_test, image)
+            
+            if os.path.exists(src_path):
+                shutil.move(src_path, dest_path)
+    
+    print(f"Se movió el {percentage}% de imágenes de train a test correctamente.")
 
 def plot_class_distribution(train_loader, valid_loader, test_loader, class_names):
     """

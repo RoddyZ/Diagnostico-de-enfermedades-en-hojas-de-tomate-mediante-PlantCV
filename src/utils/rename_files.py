@@ -3,7 +3,7 @@ import shutil
 
 def rename_images_in_directory(base_directory):
     # Crear las carpetas necesarias para 'train' y 'valid'
-    for subset in ['train', 'valid']:
+    for subset in ['train', 'valid','test']:
         subset_path = os.path.join(base_directory, subset)
 
         if os.path.exists(subset_path):
