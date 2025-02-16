@@ -2,14 +2,17 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 import torch.nn.functional as F
+from src.models.model import baseLineModel  # Importa la arquitectura del modelo
 
-def predict_image(image_path, model, class_names, device=None):
+def predict_image(image_path, model=None, weights_path=None, class_names=None, device=None):
     """
     Carga una imagen desde una ruta, la preprocesa y predice su clase con el modelo entrenado.
+    Si no se proporciona un modelo, se carga desde los pesos indicados.
 
     Parámetros:
     - image_path (str): Ruta de la imagen.
-    - model (torch.nn.Module): Modelo entrenado.
+    - model (torch.nn.Module, opcional): Modelo entrenado. Si no se proporciona, se cargará desde los pesos.
+    - weights_path (str, opcional): Ruta del archivo .pth con los pesos guardados. Requerido si `model` es None.
     - class_names (list): Lista de nombres de clases.
     - device (torch.device, opcional): CPU o GPU (se detecta automáticamente si no se especifica).
 
@@ -17,9 +20,26 @@ def predict_image(image_path, model, class_names, device=None):
     - str: Nombre de la clase predicha.
     - float: Probabilidad de la clase predicha (entre 0 y 1).
     """
+
+    # Validaciones
+    if model is None and weights_path is None:
+        raise ValueError("Debes proporcionar un modelo entrenado o la ruta de los pesos.")
+
+    if class_names is None:
+        raise ValueError("Se requiere la lista de nombres de clases para realizar la predicción.")
+
     # Definir el dispositivo
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Si no se proporciona el modelo, cargarlo desde los pesos
+    if model is None:
+        num_classes = len(class_names)  # Determinar el número de clases
+        model = baseLineModel(num_classes)  # Inicializar el modelo
+        model.load_state_dict(torch.load(weights_path))  # Cargar pesos
+        model.to(device)
+        model.eval()  # Poner en modo evaluación
+        print(f"Modelo cargado desde {weights_path}")
 
     # Transformaciones de la imagen
     transform = transforms.Compose([
@@ -36,8 +56,7 @@ def predict_image(image_path, model, class_names, device=None):
 
     # Enviar la imagen y el modelo al dispositivo
     image = image.to(device)
-    model = model.to(device)
-    model.eval()  # Modo evaluación
+    model.eval()  # Asegurar que el modelo está en modo evaluación
 
     with torch.no_grad():
         output = model(image)
