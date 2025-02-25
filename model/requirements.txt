@@ -1,0 +1,15 @@
+pytest==7.4.3
+redis==4.1.4
+tensorflow==2.8.0
+protobuf==3.20.0
+
+#dependencias plantcv
+torch>=2.1.0              # PyTorch con soporte CUDA
+torchvision>=0.16.0       # Librería para transformaciones y modelos preentrenados
+numpy==1.24.3
+matplotlib==3.7.1
+opencv-python==4.7.0.72
+plantcv==4.6
+pillow==9.5.0
+scikit-learn==1.2.2
+scipy==1.10.1
