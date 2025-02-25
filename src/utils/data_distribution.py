@@ -1,118 +1,111 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import torch
 import os
-import shutil
 import random
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+from collections import defaultdict
 
-def create_test_set(train_dir, test_dir, percentage=10):
-    """
-    Mueve un porcentaje de imágenes de cada clase en train a test, manteniendo la estructura de carpetas.
-    :param train_dir: Ruta de la carpeta train.
-    :param test_dir: Ruta de la carpeta test.
-    :param percentage: Porcentaje de imágenes a mover (por defecto, 10%).
-    """
-    train_dir = os.path.abspath(train_dir)
-    test_dir = os.path.abspath(test_dir)
+class DatasetAnalyzer:
+    def __init__(self, dataset_path):
+        """
+        Inicializa el analizador del dataset.
+        :param dataset_path: Ruta principal donde están las carpetas train, test y valid.
+        """
+        self.dataset_path = dataset_path
+        self.splits = ["train", "test", "valid"]
+        self.classes = sorted(os.listdir(os.path.join(self.dataset_path, "train")))
+        self.image_counts = {split: defaultdict(int) for split in self.splits}
+        self.sample_images = {}
     
-    if not os.path.exists(test_dir):
-        os.makedirs(test_dir)
+    def count_images(self):
+        """
+        Cuenta la cantidad de imágenes en cada conjunto (train, test, valid) y cada clase.
+        """
+        for split in self.splits:
+            for cls in self.classes:
+                class_path = os.path.join(self.dataset_path, split, cls)
+                images = os.listdir(class_path) if os.path.exists(class_path) else []
+                self.image_counts[split][cls] = len(images)
+                
+                # Tomar una imagen aleatoria si aún no se ha seleccionado
+                if cls not in self.sample_images and images:
+                    self.sample_images[cls] = os.path.join(class_path, random.choice(images))
     
-    for class_folder in os.listdir(train_dir):
-        class_path_train = os.path.join(train_dir, class_folder)
-        class_path_test = os.path.join(test_dir, class_folder)
+    def summarize_dataset(self):
+        """
+        Imprime un resumen del dataset en términos de cantidad de clases e imágenes por conjunto.
+        """
+        summary = "Resumen del Dataset:\n---------------------\n"
+        for split in self.splits:
+            summary += f"{split.capitalize()} Set:\n"
+            for cls, count in self.image_counts[split].items():
+                summary += f"  - {cls}: {count} imágenes\n"
+            summary += "\n"
         
-        if not os.path.isdir(class_path_train):
-            continue  # Saltar archivos que no sean carpetas
+        print(summary)
+    
+    def visualize_sample_images(self):
+        """
+        Visualiza una imagen aleatoria de cada clase en una matriz 5x7.
+        """
+        num_classes = len(self.sample_images)
+        rows = (num_classes // 7) + (1 if num_classes % 7 != 0 else 0)
         
-        if not os.path.exists(class_path_test):
-            os.makedirs(class_path_test)
+        fig, axes = plt.subplots(rows, 7, figsize=(20, 3 * rows))
+        axes = axes.reshape(-1) if rows > 1 else [axes]
         
-        images = [img for img in os.listdir(class_path_train) if os.path.isfile(os.path.join(class_path_train, img))]
-        num_to_move = int(len(images) * (percentage / 100))
-        images_to_move = random.sample(images, num_to_move)
+        for idx, (cls, img_path) in enumerate(self.sample_images.items()):
+            img = Image.open(img_path)
+            axes[idx].imshow(img)
+            axes[idx].axis("off")
+            axes[idx].set_title(cls, fontsize=8)
         
-        for image in images_to_move:
-            src_path = os.path.join(class_path_train, image)
-            dest_path = os.path.join(class_path_test, image)
+        # Ocultar los ejes vacíos
+        for idx in range(num_classes, len(axes)):
+            axes[idx].axis("off")
+        
+        plt.tight_layout()
+        plt.show()
+    
+    def plot_class_distribution(self):
+        """
+        Crea gráficos de barras mostrando la cantidad de imágenes por clase en cada conjunto.
+        """
+        class_labels = self.classes
+        train_counts = [self.image_counts["train"][cls] for cls in class_labels]
+        test_counts = [self.image_counts["test"][cls] for cls in class_labels]
+        valid_counts = [self.image_counts["valid"][cls] for cls in class_labels]
+
+        # Dividir en 4 gráficos para mejorar legibilidad (10, 10, 10, 8 clases por gráfico)
+        class_splits = [10, 10, 10, 8]
+        start = 0
+
+        for i, num_classes in enumerate(class_splits):
+            fig, ax = plt.subplots(figsize=(15, 6))
+            x_labels = class_labels[start:start + num_classes]
+            x_indexes = np.arange(len(x_labels))
+
+            ax.bar(x_indexes - 0.2, train_counts[start:start + num_classes], width=0.2, label="Train")
+            ax.bar(x_indexes, test_counts[start:start + num_classes], width=0.2, label="Test")
+            ax.bar(x_indexes + 0.2, valid_counts[start:start + num_classes], width=0.2, label="Valid")
+
+            ax.set_xticks(x_indexes)
+            ax.set_xticklabels(x_labels, rotation=90)
+            ax.set_ylabel("Número de imágenes")
+            ax.set_title(f"Distribución de Clases (Parte {i+1})")
+            ax.legend()
             
-            if os.path.exists(src_path):
-                shutil.move(src_path, dest_path)
-    
-    print(f"Se movió el {percentage}% de imágenes de train a test correctamente.")
+            plt.show()
+            start += num_classes
 
-def plot_class_distribution(train_loader, valid_loader, test_loader, class_names):
+
+def dataset_summary(dataset_path):
     """
-    Genera un gráfico de barras con la distribución de imágenes por clase en los conjuntos de Train, Validation y Test.
-    
-    Parámetros:
-        train_loader: DataLoader del conjunto de entrenamiento.
-        valid_loader: DataLoader del conjunto de validación.
-        test_loader: DataLoader del conjunto de prueba.
-        class_names: Lista de nombres de clases detectadas.
+    Función principal para analizar y visualizar el dataset.
+    :param dataset_path: Ruta principal del dataset.
     """
-
-    # Función para contar imágenes por clase en un DataLoader
-    def count_images(loader):
-        counts = {class_name: 0 for class_name in class_names}
-        for _, labels in loader:
-            for label in labels:
-                counts[class_names[label]] += 1
-        return counts
-
-    # Obtener los conteos de imágenes por clase
-    train_counts = count_images(train_loader)
-    valid_counts = count_images(valid_loader)
-    test_counts = count_images(test_loader)
-
-    # Crear DataFrame con los conteos
-    df = pd.DataFrame({'Train': train_counts, 'Validation': valid_counts, 'Test': test_counts})
-
-    # Graficar
-    ax = df.plot(kind='bar', figsize=(20, 10), colormap='viridis', alpha=0.85, edgecolor='black')
-
-    plt.title('Distribución de Imágenes por Clase', fontsize=16)
-    plt.xlabel('Clase', fontsize=14)
-    plt.ylabel('Número de Imágenes', fontsize=14)
-    plt.xticks(rotation=45, ha='right', fontsize=12)
-    plt.legend(title="Conjunto", fontsize=12)
-
-    # Agregar los valores numéricos encima de cada barra
-    for p in ax.patches:
-        ax.annotate(int(p.get_height()), (p.get_x() + p.get_width() / 2., p.get_height()),
-                    ha='center', va='center', xytext=(0, 8), textcoords='offset points', fontsize=10, color='black')
-
-    plt.grid(axis='y', linestyle='--', alpha=0.6)
-    plt.show()
-
-def dataset_summary(train_data, valid_data, test_data):
-    from collections import Counter
-
-    def count_images(dataset):
-        """Cuenta cuántas imágenes hay por clase en un conjunto de datos."""
-        class_counts = Counter([dataset.dataset.targets[i] for i in dataset.indices]) if isinstance(dataset, torch.utils.data.Subset) else Counter(dataset.targets)
-        total_images = sum(class_counts.values())
-        return dict(class_counts), total_images
-
-    # Contar imágenes en cada conjunto
-    train_counts, train_total = count_images(train_data)
-    valid_counts, valid_total = count_images(valid_data)
-    test_counts, test_total = count_images(test_data)
-
-    # Obtener nombres de clases
-    class_names = train_data.dataset.classes if isinstance(train_data, torch.utils.data.Subset) else train_data.classes
-
-    # Mostrar resumen
-    print("\nResumen de imágenes por clase:\n" + "-"*40)
-
-    print(f"📌 Conjunto de Entrenamiento: {train_total} imágenes en total")
-    for i, cls in enumerate(class_names):
-        print(f"  {cls}: {train_counts.get(i, 0)} imágenes")
-
-    print(f"\n📌 Conjunto de Validación: {valid_total} imágenes en total")
-    for i, cls in enumerate(class_names):
-        print(f"  {cls}: {valid_counts.get(i, 0)} imágenes")
-
-    print(f"\n📌 Conjunto de Pruebas: {test_total} imágenes en total")
-    for i, cls in enumerate(class_names):
-        print(f"  {cls}: {test_counts.get(i, 0)} imágenes")
+    analyzer = DatasetAnalyzer(dataset_path)
+    analyzer.count_images()
+    analyzer.summarize_dataset()
+    analyzer.visualize_sample_images()
+    analyzer.plot_class_distribution()
