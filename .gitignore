@@ -138,3 +138,4 @@ cvat/
 data/*
 dataset/*
 dataset_lite/*
+dataset_processed/*
