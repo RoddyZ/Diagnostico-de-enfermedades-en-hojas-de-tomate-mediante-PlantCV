@@ -1,17 +1,13 @@
 import os
 import cv2
 import numpy as np
-from plantcv import plantcv as pcv  # Importación correcta de PlantCV
+from plantcv import plantcv as pcv
 from PIL import Image
 from tqdm import tqdm
 import json
 
 class PlantCVProcessor:
     def __init__(self, debug=False):
-        """
-        Inicializa el procesador de imágenes con PlantCV.
-        :param debug: Si es True, muestra imágenes procesadas para depuración.
-        """
         self.debug = debug
     
     def segment_leaf(self, image_path):
@@ -38,41 +34,19 @@ class PlantCVProcessor:
         return corrected
     
     def analyze_color(self, image_path):
-        """
-        Obtiene el color predominante de la hoja.
-        :param image_path: Ruta de la imagen.
-        :return: Diccionario con el color promedio en RGB.
-        """
         img, _, _ = pcv.readimage(image_path)
         mask = self.segment_leaf(image_path)
-        
-        # Aplicamos la máscara a la imagen original
         masked_img = cv2.bitwise_and(img, img, mask=mask)
-        
-        # Calculamos la media de color en cada canal
         mean_color = cv2.mean(masked_img, mask=mask)
-        
         return {"R": mean_color[2], "G": mean_color[1], "B": mean_color[0]}
     
     def analyze_texture(self, image_path):
-        """
-        Analiza la textura de la hoja usando OpenCV (filtros de bordes y varianza).
-        :param image_path: Ruta de la imagen.
-        :return: Diccionario con características de textura.
-        """
         img, _, _ = pcv.readimage(image_path)
         mask = self.segment_leaf(image_path)
-
-        # Convertimos la imagen a escala de grises
         gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-
-        # Aplicamos un filtro Laplaciano para detectar bordes
         laplacian = cv2.Laplacian(gray_img, cv2.CV_64F).var()
-
-        # Aplicamos un filtro Sobel en X y Y
         sobelx = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize=5).var()
         sobely = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize=5).var()
-
         return {
             "laplacian_var": laplacian,
             "sobel_x_var": sobelx,
@@ -80,17 +54,9 @@ class PlantCVProcessor:
         }
     
     def measure_affected_area(self, image_path):
-        """
-        Mide el área afectada en la hoja usando la función bound_horizontal de PlantCV.
-        :param image_path: Ruta de la imagen.
-        :return: Diccionario con información del análisis.
-        """
         img, _, _ = pcv.readimage(image_path)
         mask = self.segment_leaf(image_path)
-
-        # Usamos una línea de referencia en la posición 50 (puede ajustarse según el dataset)
         analysis = pcv.analyze.bound_horizontal(img, mask, line_position=50)
-
         return analysis
     
     def detect_blurry_images(self, image_path):
@@ -100,27 +66,13 @@ class PlantCVProcessor:
         return laplacian < 100
     
     def count_leaves(self, image_path):
-        """
-        Cuenta el número de hojas en la imagen utilizando segmentación.
-        :param image_path: Ruta de la imagen.
-        :return: Número de hojas detectadas.
-        """
         img, _, _ = pcv.readimage(image_path)
         mask = self.segment_leaf(image_path)
-        
-        # Aplicar detección de contornos para identificar hojas
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        num_leaves = len(contours)  # Número de contornos detectados
-        
+        num_leaves = len(contours)
         return num_leaves
     
     def process_dataset(self, dataset_path, output_path="dataset_processed", save_metadata=True):
-        """
-        Procesa todas las imágenes en las carpetas train, test y valid y guarda imágenes y estadísticas.
-        :param dataset_path: Ruta base del dataset.
-        :param output_path: Ruta donde se guardarán las imágenes preprocesadas.
-        :param save_metadata: Guarda las estadísticas en un JSON si es True.
-        """
         os.makedirs(output_path, exist_ok=True)
         splits = ['train', 'test', 'valid']
         results = {}
@@ -136,7 +88,7 @@ class PlantCVProcessor:
             print(f"Procesando {split}...")
             results[split] = {}
             
-            for category in tqdm(os.listdir(split_path), disable=not self.debug):
+            for category in os.listdir(split_path):
                 category_path = os.path.join(split_path, category)
                 output_category_path = os.path.join(output_split_path, category)
                 os.makedirs(output_category_path, exist_ok=True)
@@ -146,19 +98,16 @@ class PlantCVProcessor:
                 
                 results[split][category] = []
 
-                for img_name in os.listdir(category_path):
+                for img_name in tqdm(os.listdir(category_path), desc=f"Procesando {category}", disable=not self.debug):
                     img_path = os.path.join(category_path, img_name)
                     
-                    # Aplicar preprocesamiento adicional
                     corrected_img = self.correct_lighting(img_path)
                     gray_img = self.convert_to_grayscale(img_path)
                     processed_img = self.segment_leaf(img_path)
                     
-                    # Guardar la imagen preprocesada
                     output_img_path = os.path.join(output_category_path, img_name)
                     pcv.print_image(processed_img, output_img_path)
                     
-                    # Guardar metadata
                     data = {
                         "image": img_name,
                         "num_leaves": self.count_leaves(img_path),
@@ -168,15 +117,11 @@ class PlantCVProcessor:
                         "affected_area": self.measure_affected_area(img_path)
                     }
                     results[split][category].append(data)
+                
+                print(f"Procesamiento de {category} en {split} completado.")
         
-        # Guardar estadísticas en JSON
         if save_metadata:
             with open(os.path.join(output_path, "processed_metadata.json"), "w") as f:
                 json.dump(results, f, indent=4)
         
         return results
-
-# Uso desde el notebook:
-# from src.utils.plantcv_processing import PlantCVProcessor
-# processor = PlantCVProcessor(debug=True)
-# dataset_results = processor.process_dataset("dataset")
