@@ -45,12 +45,12 @@ def detect_multiple_leaves(image_path, debug=False, target_size=(256, 256)):
     num_leaves = len(merged_contours)
     
     if debug:
-        print(f"Leaves detected: {num_leaves}")
+        print(f"Leaves detected: {num_leaves} in {image_path}")
         debug_img = img.copy()
         cv2.drawContours(debug_img, merged_contours, -1, (0, 255, 0), 2)
         pcv.print_image(debug_img, "segmented_debug.png")
     
-    return num_leaves
+    return num_leaves, image_path
 
 def process_image(args):
     image_path, debug = args
@@ -61,10 +61,10 @@ def analyze_dataset(dataset_path, debug=False):
     Recorre un dataset completo y cuenta cuántas imágenes tienen más de una hoja usando multiprocessing.
     :param dataset_path: Ruta del dataset (carpeta que contiene train, valid y test).
     :param debug: Si es True, imprime detalles del análisis.
-    :return: Diccionario con estadísticas por subconjunto y el total.
+    :return: Diccionario con estadísticas por subconjunto y el total, incluyendo archivos con múltiples hojas.
     """
     subsets = ["train", "valid", "test"]
-    results = {subset: {"total": 0, "multiple_leaves": 0} for subset in subsets}
+    results = {subset: {"total": 0, "multiple_leaves": 0, "files": []} for subset in subsets}
     image_paths = []
     
     for subset in subsets:
@@ -96,14 +96,19 @@ def analyze_dataset(dataset_path, debug=False):
                 continue
             
             for image_file in os.listdir(class_path):
-                num_leaves = results_list[index]
+                num_leaves, image_path = results_list[index]
                 index += 1
                 results[subset]["total"] += 1
                 if num_leaves > 1:
                     results[subset]["multiple_leaves"] += 1
+                    results[subset]["files"].append(image_path)
     
     if debug:
         for subset, stats in results.items():
             print(f"{subset.upper()} - Total Images: {stats['total']}, Multiple Leaves: {stats['multiple_leaves']}")
+            if stats["files"]:
+                print("Files with multiple leaves:")
+                for file in stats["files"]:
+                    print(file)
     
     return results
