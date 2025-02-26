@@ -3,16 +3,20 @@ import cv2
 import numpy as np
 from plantcv import plantcv as pcv
 
-def detect_multiple_leaves(image_path, debug=False):
+def detect_multiple_leaves(image_path, debug=False, target_size=(256, 256)):
     """
     Detecta si hay más de una hoja en la imagen y devuelve el número de hojas detectadas.
     :param image_path: Ruta de la imagen de entrada.
     :param debug: Si es True, muestra el resultado.
+    :param target_size: Tamaño de la imagen normalizada.
     :return: Número de hojas detectadas en la imagen.
     """
     img, _, _ = pcv.readimage(image_path)
+    img = cv2.resize(img, target_size, interpolation=cv2.INTER_AREA)  # Asegurar tamaño estándar
     grayscale_img = pcv.rgb2gray_lab(rgb_img=img, channel='l')
-    binary_img = pcv.threshold.binary(grayscale_img, threshold=128, object_type='light')
+    
+    # Usar umbralización de Otsu en lugar de un umbral fijo
+    binary_img = pcv.threshold.otsu(grayscale_img)
     filled_img = pcv.fill_holes(binary_img)
     mask = pcv.dilate(filled_img, ksize=5, i=2)
     
@@ -25,12 +29,24 @@ def detect_multiple_leaves(image_path, debug=False):
     # Encontrar contornos de los objetos segmentados usando OpenCV
     contours, _ = cv2.findContours(labeled_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
-    # Contar el número de hojas detectadas
-    num_leaves = len(contours)
+    # Ajustar min_leaf_area dinámicamente según el tamaño de la imagen
+    reference_size = 256 * 256  # Tamaño base para imágenes normalizadas
+    min_leaf_area = (5000 / reference_size) * (target_size[0] * target_size[1])  # Escalar según tamaño
+    
+    # Filtrar contornos pequeños (ruido)
+    filtered_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > min_leaf_area]
+    
+    # Aplicar convexHull para fusionar contornos cercanos y evitar sobresegmentación
+    merged_contours = [cv2.convexHull(cnt) for cnt in filtered_contours]
+    
+    # Contar el número de hojas detectadas después del filtrado y fusión
+    num_leaves = len(merged_contours)
     
     if debug:
         print(f"Leaves detected: {num_leaves}")
-        pcv.print_image(labeled_binary, "segmented_debug.png")
+        debug_img = img.copy()
+        cv2.drawContours(debug_img, merged_contours, -1, (0, 255, 0), 2)
+        pcv.print_image(debug_img, "segmented_debug.png")
     
     return num_leaves
 
