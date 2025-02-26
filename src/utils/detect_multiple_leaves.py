@@ -1,6 +1,8 @@
 import os
 import cv2
 import numpy as np
+import multiprocessing
+from tqdm import tqdm
 from plantcv import plantcv as pcv
 
 def detect_multiple_leaves(image_path, debug=False, target_size=(256, 256)):
@@ -50,15 +52,20 @@ def detect_multiple_leaves(image_path, debug=False, target_size=(256, 256)):
     
     return num_leaves
 
+def process_image(args):
+    image_path, debug = args
+    return detect_multiple_leaves(image_path, debug)
+
 def analyze_dataset(dataset_path, debug=False):
     """
-    Recorre un dataset completo y cuenta cuántas imágenes tienen más de una hoja.
+    Recorre un dataset completo y cuenta cuántas imágenes tienen más de una hoja usando multiprocessing.
     :param dataset_path: Ruta del dataset (carpeta que contiene train, valid y test).
     :param debug: Si es True, imprime detalles del análisis.
     :return: Diccionario con estadísticas por subconjunto y el total.
     """
     subsets = ["train", "valid", "test"]
     results = {subset: {"total": 0, "multiple_leaves": 0} for subset in subsets}
+    image_paths = []
     
     for subset in subsets:
         subset_path = os.path.join(dataset_path, subset)
@@ -72,7 +79,25 @@ def analyze_dataset(dataset_path, debug=False):
             
             for image_file in os.listdir(class_path):
                 image_path = os.path.join(class_path, image_file)
-                num_leaves = detect_multiple_leaves(image_path)
+                image_paths.append((image_path, debug))
+    
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        results_list = list(tqdm(pool.imap(process_image, image_paths), total=len(image_paths), desc="Procesando imágenes"))
+    
+    index = 0
+    for subset in subsets:
+        subset_path = os.path.join(dataset_path, subset)
+        if not os.path.exists(subset_path):
+            continue
+        
+        for class_folder in os.listdir(subset_path):
+            class_path = os.path.join(subset_path, class_folder)
+            if not os.path.isdir(class_path):
+                continue
+            
+            for image_file in os.listdir(class_path):
+                num_leaves = results_list[index]
+                index += 1
                 results[subset]["total"] += 1
                 if num_leaves > 1:
                     results[subset]["multiple_leaves"] += 1
