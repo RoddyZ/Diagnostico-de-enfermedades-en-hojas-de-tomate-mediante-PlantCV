@@ -31,19 +31,19 @@ def detect_rotation_and_shadows(image_path, angle_threshold=30, shadow_threshold
     
     return False
 
-def copy_to_deprecated(image_path, dataset_path, deprecated_path="dataset_deprecated"):
+def move_to_deprecated(image_path, dataset_path, deprecated_path="dataset_deprecated"):
     """
-    Copia imágenes descartadas o con múltiples hojas a la carpeta 'dataset_deprecated', manteniendo la jerarquía original.
+    Mueve imágenes descartadas o con múltiples hojas a la carpeta 'dataset_deprecated', manteniendo la jerarquía original.
     """
     try:
         relative_path = os.path.relpath(image_path, dataset_path)
         new_path = os.path.join(deprecated_path, *relative_path.split(os.sep))
         new_path = os.path.abspath(new_path)
         os.makedirs(os.path.dirname(new_path), exist_ok=True)
-        shutil.copy2(image_path, new_path)
-        print(f"Copied to deprecated: {new_path}")
+        shutil.move(image_path, new_path)
+        print(f"Moved to deprecated: {new_path}")
     except Exception as e:
-        print(f"Error copying {image_path} to deprecated: {e}")
+        print(f"Error moving {image_path} to deprecated: {e}")
 
 def detect_multiple_leaves(args):
     """
@@ -82,7 +82,7 @@ def detect_multiple_leaves(args):
 def analyze_dataset(dataset_path, debug=False):
     """
     Recorre un dataset completo y cuenta cuántas imágenes tienen más de una hoja usando multiprocessing.
-    También descarta imágenes con rotaciones extremas o sombras y las copia a la carpeta 'dataset_deprecated'.
+    También descarta imágenes con rotaciones extremas o sombras y las mueve a la carpeta 'dataset_deprecated'.
     """
     subsets = ["train", "valid", "test"]
     results = {subset: {"total": 0, "multiple_leaves": 0, "discarded": [], "files": []} for subset in subsets}
@@ -114,7 +114,7 @@ def analyze_dataset(dataset_path, debug=False):
                     image_path = os.path.abspath(image_path)
                     
                     if result is None:
-                        copy_to_deprecated(image_path, dataset_path)
+                        move_to_deprecated(image_path, dataset_path)
                         results[subset]["discarded"].append(file)
                         continue
                     
@@ -124,7 +124,7 @@ def analyze_dataset(dataset_path, debug=False):
                         if num_leaves > 1:
                             results[subset]["multiple_leaves"] += 1
                             results[subset]["files"].append(image_path)
-                            copy_to_deprecated(image_path, dataset_path)  # Copiar imágenes con múltiples hojas
+                            move_to_deprecated(image_path, dataset_path)  # Mover imágenes con múltiples hojas
     
     if debug:
         for subset, stats in results.items():

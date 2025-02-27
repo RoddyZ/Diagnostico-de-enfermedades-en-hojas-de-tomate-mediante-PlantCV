@@ -2,12 +2,14 @@ import os
 import cv2
 import numpy as np
 from tqdm import tqdm
+import shutil
 
 class PlantCVFilter:
-    def __init__(self, debug=False, blur_threshold=100, target_size=(256, 256)):
+    def __init__(self, debug=False, blur_threshold=100, target_size=(256, 256), deprecated_path="dataset_deprecated"):
         self.debug = debug
         self.blur_threshold = blur_threshold
         self.target_size = target_size
+        self.deprecated_path = deprecated_path
     
     def is_blurry(self, image_path):
         img = cv2.imread(image_path)
@@ -20,10 +22,23 @@ class PlantCVFilter:
         resized_img = cv2.resize(img, self.target_size, interpolation=cv2.INTER_AREA)
         cv2.imwrite(output_path, resized_img)
     
+    def move_to_deprecated(self, image_path, dataset_path):
+        """
+        Mueve imágenes borrosas a la carpeta 'dataset_deprecated', manteniendo la jerarquía original.
+        """
+        try:
+            relative_path = os.path.relpath(image_path, dataset_path)
+            new_path = os.path.join(self.deprecated_path, *relative_path.split(os.sep))
+            new_path = os.path.abspath(new_path)
+            os.makedirs(os.path.dirname(new_path), exist_ok=True)
+            shutil.move(image_path, new_path)
+        except Exception as e:
+            print(f"Error moving {image_path} to deprecated: {e}")
+    
     def filter_and_normalize_dataset(self, dataset_path, output_path="filtered_dataset"):
         os.makedirs(output_path, exist_ok=True)
         splits = ['train', 'test', 'valid']
-        blurry_removed = 0  # Contador de imágenes borrosas eliminadas
+        blurry_removed = 0  # Contador de imágenes borrosas movidas
 
         for split in splits:
             split_path = os.path.join(dataset_path, split)
@@ -48,7 +63,8 @@ class PlantCVFilter:
                     output_img_path = os.path.join(output_category_path, img_name)
 
                     if self.is_blurry(img_path):
-                        blurry_removed += 1  # Contar la imagen borrosa eliminada
+                        self.move_to_deprecated(img_path, dataset_path)
+                        blurry_removed += 1  # Contar la imagen borrosa movida
                         continue  # Omitir imágenes borrosas
 
                     self.resize_image(img_path, output_img_path)
@@ -57,6 +73,5 @@ class PlantCVFilter:
 
         print("Filtrado y normalización completados.")
 
-        # 🔹 Devolver información sobre el número de imágenes eliminadas
-        return {"blurry_removed": blurry_removed}
-
+        # 🔹 Devolver información sobre el número de imágenes movidas
+        return {"blurry_moved": blurry_removed}
