@@ -140,3 +140,4 @@ dataset/*
 dataset_lite/*
 dataset_processed/*
 dataset_filtered/*
+dataset_deprecated/*
