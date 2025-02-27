@@ -1,9 +1,9 @@
 pytest==7.4.3
-torch==2.5.1+cu121        # PyTorch con soporte CUDA
-torchvision==0.21.0       # Librería para transformaciones y modelos preentrenados
-numpy==1.24.3
+#torch==2.5.1+cu121        # PyTorch con soporte CUDA
+#torchvision==0.21.0       # Librería para transformaciones y modelos preentrenados
+numpy>=1.25.0
 matplotlib==3.7.1
-opencv-python==4.7.0.72
+opencv-python==4.9.0.80
 plantcv==4.6
 pillow==9.5.0
 scikit-learn==1.2.2
