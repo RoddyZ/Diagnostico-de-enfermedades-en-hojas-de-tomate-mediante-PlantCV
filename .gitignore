@@ -138,3 +138,7 @@ cvat/
 data/*
 dataset/*
 dataset_lite/*
+dataset_processed/*
+dataset_filtered/*
+dataset_deprecated/*
+dataset_discard_leaves/*
