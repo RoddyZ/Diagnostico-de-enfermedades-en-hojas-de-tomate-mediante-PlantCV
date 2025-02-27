@@ -49,27 +49,26 @@ class PlantCVFilter:
                 continue
 
             print(f"Filtrando y normalizando {split}...")
+            image_files = []
 
             for category in os.listdir(split_path):
                 category_path = os.path.join(split_path, category)
-                output_category_path = os.path.join(output_split_path, category)
-                os.makedirs(output_category_path, exist_ok=True)
+                if os.path.isdir(category_path):
+                    for img_name in os.listdir(category_path):
+                        image_files.append(os.path.join(category_path, img_name))
 
-                if not os.path.isdir(category_path):
-                    continue
+            for img_path in tqdm(image_files, desc=f"Procesando {split}"):
+                img_name = os.path.basename(img_path)
+                output_img_path = os.path.join(output_split_path, img_name)
+                
+                if self.is_blurry(img_path):
+                    self.move_to_deprecated(img_path, dataset_path)
+                    blurry_removed += 1  # Contar la imagen borrosa movida
+                    continue  # Omitir imágenes borrosas
 
-                for img_name in tqdm(os.listdir(category_path), desc=f"Procesando {category}"):
-                    img_path = os.path.join(category_path, img_name)
-                    output_img_path = os.path.join(output_category_path, img_name)
-
-                    if self.is_blurry(img_path):
-                        self.move_to_deprecated(img_path, dataset_path)
-                        blurry_removed += 1  # Contar la imagen borrosa movida
-                        continue  # Omitir imágenes borrosas
-
-                    self.resize_image(img_path, output_img_path)
-
-                print(f"Filtrado de {category} en {split} completado.")
+                self.resize_image(img_path, output_img_path)
+            
+            print(f"Filtrado de {split} completado.")
 
         print("Filtrado y normalización completados.")
 
