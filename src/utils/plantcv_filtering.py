@@ -22,18 +22,18 @@ class PlantCVFilter:
         resized_img = cv2.resize(img, self.target_size, interpolation=cv2.INTER_AREA)
         cv2.imwrite(output_path, resized_img)
     
-    def move_to_deprecated(self, image_path, dataset_path):
+    def copy_to_deprecated(self, image_path, dataset_path):
         """
-        Mueve imágenes borrosas a la carpeta 'dataset_deprecated', manteniendo la jerarquía original.
+        Copia imágenes borrosas a la carpeta 'dataset_deprecated', manteniendo la jerarquía original.
         """
         try:
             relative_path = os.path.relpath(image_path, dataset_path)
             new_path = os.path.join(self.deprecated_path, *relative_path.split(os.sep))
             new_path = os.path.abspath(new_path)
             os.makedirs(os.path.dirname(new_path), exist_ok=True)
-            shutil.move(image_path, new_path)
+            shutil.copy(image_path, new_path)
         except Exception as e:
-            print(f"Error moving {image_path} to deprecated: {e}")
+            print(f"Error copying {image_path} to deprecated: {e}")
     
     def filter_and_normalize_dataset(self, dataset_path, output_path="filtered_dataset"):
         os.makedirs(output_path, exist_ok=True)
@@ -62,8 +62,8 @@ class PlantCVFilter:
                 output_img_path = os.path.join(output_split_path, img_name)
                 
                 if self.is_blurry(img_path):
-                    self.move_to_deprecated(img_path, dataset_path)
-                    blurry_removed += 1  # Contar la imagen borrosa movida
+                    self.copy_to_deprecated(img_path, dataset_path)
+                    blurry_removed += 1  # Contar la imagen borrosa copiada
                     continue  # Omitir imágenes borrosas
 
                 self.resize_image(img_path, output_img_path)
@@ -72,5 +72,5 @@ class PlantCVFilter:
 
         print("Filtrado y normalización completados.")
 
-        # 🔹 Devolver información sobre el número de imágenes movidas
-        return {"blurry_moved": blurry_removed}
+        # 🔹 Devolver información sobre el número de imágenes copiadas
+        return blurry_removed
