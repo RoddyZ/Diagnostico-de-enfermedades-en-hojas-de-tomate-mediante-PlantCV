@@ -31,7 +31,7 @@ def detect_rotation_and_shadows(image_path, angle_threshold=30, shadow_threshold
     
     return False
 
-def move_to_deprecated(image_path, dataset_path, deprecated_path="dataset_deprecated"):
+def move_to_deprecated(image_path, dataset_path, deprecated_path="dataset_discard_leaves"):
     """
     Mueve imágenes descartadas o con múltiples hojas a la carpeta 'dataset_deprecated', manteniendo la jerarquía original.
     """

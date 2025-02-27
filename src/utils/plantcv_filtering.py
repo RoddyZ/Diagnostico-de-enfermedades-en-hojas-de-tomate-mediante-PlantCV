@@ -28,7 +28,7 @@ class PlantCVFilter:
         """
         try:
             relative_path = os.path.relpath(image_path, dataset_path)
-            new_path = os.path.join(self.deprecated_path, *relative_path.split(os.sep))
+            new_path = os.path.join(self.deprecated_path, relative_path)
             new_path = os.path.abspath(new_path)
             os.makedirs(os.path.dirname(new_path), exist_ok=True)
             shutil.copy(image_path, new_path)
@@ -58,8 +58,9 @@ class PlantCVFilter:
                         image_files.append(os.path.join(category_path, img_name))
 
             for img_path in tqdm(image_files, desc=f"Procesando {split}"):
-                img_name = os.path.basename(img_path)
-                output_img_path = os.path.join(output_split_path, img_name)
+                relative_path = os.path.relpath(img_path, dataset_path)
+                output_img_path = os.path.join(output_path, relative_path)
+                os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
                 
                 if self.is_blurry(img_path):
                     self.copy_to_deprecated(img_path, dataset_path)
