@@ -4,6 +4,7 @@ import numpy as np
 import multiprocessing
 from tqdm import tqdm
 from plantcv import plantcv as pcv
+import shutil
 
 def detect_rotation_and_shadows(image_path, angle_threshold=30, shadow_threshold=50):
     """
@@ -33,7 +34,7 @@ def detect_rotation_and_shadows(image_path, angle_threshold=30, shadow_threshold
     
     return False
 
-def move_to_deprecated(image_path, dataset_path, deprecated_path="deprecated"):
+def move_to_deprecated(image_path, dataset_path, deprecated_path="dataset_deprecated"):
     """
     Mueve imágenes descartadas a la carpeta 'deprecated', manteniendo la jerarquía original.
     """
@@ -97,6 +98,15 @@ def process_image(args):
     image_path, debug = args
     return detect_multiple_leaves(image_path, debug)
 
+def copy_to_deprecated(image_path, dataset_path, deprecated_path="dataset_deprecated"):
+    """
+    Copia imágenes descartadas a la carpeta 'deprecated', manteniendo la jerarquía original.
+    """
+    relative_path = os.path.relpath(image_path, dataset_path)
+    new_path = os.path.join(deprecated_path, relative_path)
+    os.makedirs(os.path.dirname(new_path), exist_ok=True)
+    shutil.copy2(image_path, new_path)
+
 def analyze_dataset(dataset_path, debug=False):
     """
     Recorre un dataset completo y cuenta cuántas imágenes tienen más de una hoja usando multiprocessing.
@@ -105,42 +115,42 @@ def analyze_dataset(dataset_path, debug=False):
     subsets = ["train", "valid", "test"]
     results = {subset: {"total": 0, "multiple_leaves": 0, "discarded": [], "files": []} for subset in subsets}
     image_paths = []
-    
+
     for subset in subsets:
         subset_path = os.path.join(dataset_path, subset)
         if not os.path.exists(subset_path):
             continue
-        
-        for class_folder in os.listdir(subset_path):
-            class_path = os.path.join(subset_path, class_folder)
-            if not os.path.isdir(class_path):
-                continue
-            
-            for image_file in os.listdir(class_path):
-                image_path = os.path.join(class_path, image_file)
-                image_paths.append((image_path, debug))
-    
+
+        for root, _, files in os.walk(subset_path):
+            for file in files:
+                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    image_path = os.path.join(root, file)
+                    image_paths.append((image_path, debug))
+
     with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
         results_list = list(tqdm(pool.imap(process_image, image_paths), total=len(image_paths), desc="Procesando imágenes"))
-    
+
     index = 0
     for subset in subsets:
-        for image_file in os.listdir(os.path.join(dataset_path, subset)):
-            result = results_list[index]
-            index += 1
-            if result is None:
-                image_path = os.path.join(dataset_path, subset, image_file)
-                results[subset]["discarded"].append(image_file)
-                move_to_deprecated(image_path, dataset_path)
-                continue
-            num_leaves, image_path = result
-            results[subset]["total"] += 1
-            if num_leaves > 1:
-                results[subset]["multiple_leaves"] += 1
-                results[subset]["files"].append(image_path)
-    
+        for root, _, files in os.walk(os.path.join(dataset_path, subset)):
+            for file in files:
+                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    result = results_list[index]
+                    index += 1
+                    if result is None:
+                        image_path = os.path.join(root, file)
+                        copy_to_deprecated(image_path, dataset_path)
+                        results[subset]["discarded"].append(file)
+                        continue
+                    num_leaves, image_path = result
+                    if num_leaves is not None:
+                        results[subset]["total"] += 1
+                        if num_leaves > 1:
+                            results[subset]["multiple_leaves"] += 1
+                            results[subset]["files"].append(os.path.normpath(image_path)) # Normalizar la ruta
+
     if debug:
         for subset, stats in results.items():
             print(f"{subset.upper()} - Total Images: {stats['total']}, Multiple Leaves: {stats['multiple_leaves']}, Discarded: {len(stats['discarded'])}")
-    
+
     return results
