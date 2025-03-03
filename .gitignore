@@ -143,3 +143,4 @@ dataset_filtered/*
 dataset_deprecated/*
 dataset_discard_leaves/*
 dataset_processed_filtered/*
+dataset_segmented/*
