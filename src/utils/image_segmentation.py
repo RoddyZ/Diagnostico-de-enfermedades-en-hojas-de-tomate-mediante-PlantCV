@@ -1,7 +1,6 @@
 import os
 import cv2
 import numpy as np
-from plantcv import plantcv as pcv
 from tqdm import tqdm
 from pathlib import Path
 
@@ -18,7 +17,7 @@ def segment_leaves(input_dir, output_dir):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     # Recorrer las carpetas de train, valid
-    for split in ['train', 'valid']: #, 'test'
+    for split in ['train', 'valid']:  # , 'test'
         split_input_dir = os.path.join(input_dir, split)
         split_output_dir = os.path.join(output_dir, split)
 
@@ -45,17 +44,29 @@ def segment_leaves(input_dir, output_dir):
                 hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
                 # Crear una máscara basada en el rango de color verde (para hojas)
-                lower_green = np.array([30, 40, 40])  # Valores mínimos de H, S, V
+                lower_green = np.array([25, 40, 40])  # Valores mínimos de H, S, V
                 upper_green = np.array([90, 255, 255])  # Valores máximos de H, S, V
-                mask = cv2.inRange(hsv_img, lower_green, upper_green)
+                green_mask = cv2.inRange(hsv_img, lower_green, upper_green)
 
-                # Aplicar operaciones morfológicas para eliminar ruido
+                # Convertir a escala de grises para detectar bordes
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                # Aplicar desenfoque gaussiano para reducir el ruido
+                blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+                # Detectar bordes con Canny
+                edges = cv2.Canny(blurred, 50, 150)
+
+                # Combinar la máscara de color verde con la máscara de bordes
+                combined_mask = cv2.bitwise_or(green_mask, edges)
+
+                # Aplicar operaciones morfológicas para mejorar la máscara
                 kernel = np.ones((5, 5), np.uint8)
-                mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)  # Eliminar pequeños objetos
-                mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Rellenar pequeños agujeros
+                combined_mask = cv2.morphologyEx(combined_mask, cv2.MORPH_CLOSE, kernel)  # Rellenar pequeños agujeros
+                combined_mask = cv2.morphologyEx(combined_mask, cv2.MORPH_OPEN, kernel)  # Eliminar pequeños objetos
 
-                # Aplicar la máscara a la imagen original
-                segmented_img = cv2.bitwise_and(img, img, mask=mask)
+                # Aplicar la máscara combinada a la imagen original
+                segmented_img = cv2.bitwise_and(img, img, mask=combined_mask)
 
                 # Guardar la imagen segmentada
                 cv2.imwrite(output_path, segmented_img)
