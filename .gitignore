@@ -147,4 +147,5 @@ dataset_segmented/*
 dataset_clean/*
 dataset_denoised/*
 dataset_clean_augmentation/*
+dataset_augmentation/*
 caracteristicas.csv
