@@ -144,3 +144,7 @@ dataset_deprecated/*
 dataset_discard_leaves/*
 dataset_processed_filtered/*
 dataset_segmented/*
+dataset_clean/*
+dataset_denoised/*
+dataset_clean_augmentation/*
+caracteristicas.csv
