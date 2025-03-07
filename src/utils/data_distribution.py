@@ -4,9 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from collections import defaultdict
+import shutil
 
 class DatasetAnalyzer:
-    def __init__(self, dataset_path):
+    def _init_(self, dataset_path):
         """
         Inicializa el analizador del dataset.
         :param dataset_path: Ruta principal donde están las carpetas train, test y valid.
@@ -109,3 +110,33 @@ def dataset_summary(dataset_path):
     analyzer.summarize_dataset()
     analyzer.visualize_sample_images()
     analyzer.plot_class_distribution()
+
+
+def create_test_set(train_dir, test_dir, percentage=10):
+    """
+    Crea un conjunto de prueba a partir de un directorio de entrenamiento.
+
+    Args:
+        train_dir (str): Ruta al directorio de entrenamiento.
+        test_dir (str): Ruta al directorio de prueba.
+        percentage (int, optional): Porcentaje de imágenes a mover al conjunto de prueba. Defaults to 10.
+    """
+
+    if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
+
+    for subdir in os.listdir(train_dir):
+        subdir_path = os.path.join(train_dir, subdir)
+        if os.path.isdir(subdir_path):
+            test_subdir_path = os.path.join(test_dir, subdir)
+            if not os.path.exists(test_subdir_path):
+                os.makedirs(test_subdir_path)
+
+            images = os.listdir(subdir_path)
+            num_test_images = int(len(images) * percentage / 100)
+            test_images = random.sample(images, num_test_images)
+
+            for image in test_images:
+                src_path = os.path.join(subdir_path, image)
+                dest_path = os.path.join(test_subdir_path, image)
+                shutil.move(src_path, dest_path)
