@@ -151,7 +151,7 @@ if "token" in st.session_state:
     # Mostrar imagen escalada si se ha cargado
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Imagen subida", width=300)
+        st.image(image, caption="Imagen subida", width=600)
 
     if "classification_done" not in st.session_state:
         st.session_state.classification_done = False
