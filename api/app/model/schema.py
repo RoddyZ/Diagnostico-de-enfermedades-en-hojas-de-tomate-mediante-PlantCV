@@ -7,6 +7,8 @@ class PredictRequest(BaseModel):
 
 class PredictResponse(BaseModel):
     success: bool
-    prediction: str
-    score: float
+    predicted_class_enfermedad: str
+    predicted_prob_enfermedad: float
+    predicted_class_especie: str
+    predicted_prob_especie: float
     image_file_name: str
