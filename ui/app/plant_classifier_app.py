@@ -172,8 +172,8 @@ if "token" in st.session_state:
                 else:
                     st.write(f"**La planta {predicted_class_especie} tiene la enfermedad :** {predicted_class_enfermedad}")
 
-                st.write(f"**Con un nivel de certeza de : ")  # Mostrar con dos decimales
-                st.write(f"Enfermedad:** {predicted_prob_enfermedad:.2f}%; **Especie:** {predicted_prob_especie:.2f}%")
+                st.write(f"Con un nivel de certeza de : ")  # Mostrar con dos decimales
+                st.write(f"Enfermedad:** {predicted_prob_enfermedad:.2f}%; **Especie: {predicted_prob_especie:.2f}%")
                 st.session_state.classification_done = True
                 st.session_state.result = result
             else:
