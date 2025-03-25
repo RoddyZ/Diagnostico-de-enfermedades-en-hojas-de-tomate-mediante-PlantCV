@@ -63,7 +63,7 @@ def login(username: str, password: str) -> Optional[str]:
             return token
 
     except requests.RequestException as e:
-        st.error(f"An error occurred while logging in: {e}")
+        st.error(f"Se produjo un error al iniciar sesión: {e}")
 
     # 7: Return None if login fails
     return None
@@ -112,7 +112,7 @@ def predict(token: str, uploaded_file: Image) -> requests.Response:
         return response
 
     except requests.RequestException as e:
-        st.error(f"An error occurred while making the predicted_class_enfermedad: {e}")
+        st.error(f"Ocurrió un error al hacer la predicción: {e}")
         return None
 
 
@@ -133,11 +133,11 @@ if "token" not in st.session_state:
         token = login(username, password)
         if token:
             st.session_state.token = token
-            st.success("Login successful!")
+            st.success("Inicio de sesión exitoso!")
         else:
-            st.error("Login failed. Please check your credentials.")
+            st.error("Error al iniciar sesión. Por favor, revise sus credenciales.")
 else:
-    st.success("You are logged in!")
+    st.success("¡Has iniciado sesión!")
 
 
 if "token" in st.session_state:
@@ -172,7 +172,8 @@ if "token" in st.session_state:
                 else:
                     st.write(f"**La planta {predicted_class_especie} tiene la enfermedad :** {predicted_class_enfermedad}")
 
-                st.write(f"**Con un nivel de certeza de : Enfermedad:** {predicted_prob_enfermedad:.2f}%; **Especie:** {predicted_prob_especie:.2f}%")  # Mostrar con dos decimales
+                st.write(f"Con un nivel de certeza de : ")  # Mostrar con dos decimales
+                st.write(f"Enfermedad:** {predicted_prob_enfermedad:.2f}%; **Especie: {predicted_prob_especie:.2f}%")
                 st.session_state.classification_done = True
                 st.session_state.result = result
             else:

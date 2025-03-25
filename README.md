@@ -4,9 +4,9 @@ Descripcion: La detección temprana de enfermedades en cultivos es vital para la
 
 
 
-## Installation
+## Instalación
 
-To run the services using compose:
+Para ejecutar los servicios usando docker-compose:
 
 ```bash
 $ cp .env.original .env
@@ -16,25 +16,25 @@ $ cp .env.original .env
 $ docker network create shared_network
 ```
 
-Only for mac M1 users:
-- There is dockerfile for M1 macs model/Dockerfile.M1. This docker file downloads tensoflow compiled for M1
-- Change docker-compose.yaml to use that docker file.
-- Remove tensorflow for requirements.txt
-- Remember change back docker-compose.yaml and requirements.txt in the submission.
+Solo para usuarios de Mac con procesador M1:
+- Hay un Dockerfile específico para Mac M1 en model/Dockerfile.M1. Este Dockerfile descarga TensorFlow    compilado para M1.
+- Modifica docker-compose.yaml para que use ese Dockerfile.
+- Elimina TensorFlow de requirements.txt
+- Recuerda restaurar docker-compose.yaml y requirements.txt antes de hacer la entrega.
 
-**Warning:** You won't be able to start the proyect until you complete the Dockerfile found at `api` folder, as stated in the [ASSIGNMENT.md](./ASSIGNMENT.md) file.
+**Advertencia:** No podrás iniciar el proyecto hasta completar el Dockerfile que se encuentra en la carpeta api, como se menciona en el archivo ASSIGNMENT.md.
 
 ```bash
 $ docker-compose up --build -d
 ```
 
-To stop the services:
+Para detener los servicios:
 
 ```bash
 $ docker-compose down
 ```
 
-Populate the database:
+Poblar la base de datos:
 ```bash
 cd api
 cp .env.original .env
@@ -42,17 +42,17 @@ docker-compose up --build -d
 ```
 
 
-## Access fastapi docs
+## Acceder a la documentación de FastAPI
 
 URL = http://localhost:8000/docs
 
 
 ![Sample Image](fastapi_docs.png)
 
-To try the endpoints you need Authorize with user = admin@example.com password = admin
+Para probar los endpoints, necesitas autenticarte con: user = admin@example.com password = admin
 
 
-## Access the UI
+## Acceder a la Interfaz de Usuario
 
 URL = http://localhost:9090
 
@@ -60,10 +60,10 @@ URL = http://localhost:9090
 
 ![Sample Image](ui_classify.png)
 
-- Login with:
+- Inicia sesión con:
     - user: `admin@example.com`
     - pass: `admin`
-- You can upload an image
-- You can classify it
+- Puedes subir una imagen.
+- Puedes clasificarla.
 
 
