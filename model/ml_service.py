@@ -5,13 +5,9 @@ import time
 import numpy as np
 import redis
 import settings
-from tensorflow.keras.applications import ResNet50
-from tensorflow.keras.applications.resnet50 import decode_predictions, preprocess_input
-from tensorflow.keras.preprocessing import image
 
-from predict import predict_image
+from predict import load_predictor
 
-# TODO
 # Connect to Redis and assign to variable `db``
 # Make use of settings.py module to get Redis settings like host, port, etc.
 try:
@@ -27,29 +23,11 @@ except redis.ConnectionError as e:
     print("Redis connection failed:", e)
     db = None
 
+model_path='./full_model.h5'
+weights_path = "./weights.28-0.02.hdf5"
 
-# TODO
-# Load your ML model and assign to variable `model`
-# See https://drive.google.com/file/d/1ADuBSE4z2ZVIdn66YDSwxKv-58U7WEOn/view?usp=sharing
-# for more information about how to use this model.
-model = ResNet50(include_top=True, weights="imagenet")
-# Parámetros fijos
-WEIGHTS_PATH = "./base_line.pth"  # Ruta de los pesos del modelo
-
-# Lista de clases actualizada
-CLASS_NAMES = [
-    "Bacterial_spot",
-    "Early_blight",
-    "Healthy",
-    "Late_blight",
-    "Leaf_Mold",
-    "Powdery_mildew",
-    "Septoria_leaf_spot",
-    "Spider_mites Two-spotted_spider_mite",
-    "Target_Spot",
-    "Tomato_mosaic_virus",
-    "Tomato_Yellow_Leaf_Curl_Virus"
-]
+# Cargar el predictor
+predictor = load_predictor(model_path = model_path, weights_path = weights_path)
 
 def predict(image_name):
     """
@@ -69,13 +47,10 @@ def predict(image_name):
     img_path = os.path.join(settings.UPLOAD_FOLDER, image_name)
 
     # Llamar a predict_image con los parámetros predefinidos
-    class_name, pred_probability = predict_image(
-        image_path=img_path,
-        weights_path=WEIGHTS_PATH,
-        class_names=CLASS_NAMES
-    )
+    print('definitiva ',img_path)
+    predicted_class_enfermedad,predicted_prob_enfermedad,predicted_class_especie,predicted_prob_especie = predictor.predict(img_path)
 
-    return class_name, round(pred_probability, 4)
+    return predicted_class_enfermedad, predicted_prob_enfermedad,predicted_class_especie,predicted_prob_especie
 
 
 def classify_process():
@@ -90,20 +65,6 @@ def classify_process():
     received, then, run our ML model to get predictions.
     """
     while True:
-        # Inside this loop you should add the code to:
-        #   1. Take a new job from Redis
-        #   2. Run your ML model on the given data
-        #   3. Store model prediction in a dict with the following shape:
-        #      {
-        #         "prediction": str,
-        #         "score": float,
-        #      }
-        #   4. Store the results on Redis using the original job ID as the key
-        #      so the API can match the results it gets to the original job
-        #      sent
-        # Hint: You should be able to successfully implement the communication
-        #       code with Redis making use of functions brpop() and set().
-        # TODO
         # 1.  Take a new job from Redis
         job_data = db.brpop(settings.REDIS_QUEUE,timeout=settings.SERVER_SLEEP)
 
@@ -121,18 +82,21 @@ def classify_process():
             # Get the file name without directories
             image_name = image_name.split("/")[-1]
             # #2. Run the loaded ml model (use the predict() function)
-            class_name, pred_probability = predict(image_name)
+
+            predicted_class_enfermedad, predicted_prob_enfermedad, predicted_class_especie, predicted_prob_especie = predict(image_name)
 
             # 3.  Prepare a new JSON with the results
             output = {
-                "prediction": class_name,
-                "score": pred_probability
+                'predicted_class_enfermedad': predicted_class_enfermedad,
+                'predicted_prob_enfermedad':  predicted_prob_enfermedad,
+                'predicted_class_especie':    predicted_class_especie,
+                'predicted_prob_especie':     predicted_prob_especie
             }
 
             # 4.  Store the job results on Redis using the original
             # job ID as the key
             db.set(job_id, json.dumps(output))
-            print(f"Processed job {job_id} with prediction {class_name} and score {pred_probability}")
+            print(f"Processed job {job_id} with prediction {predicted_class_enfermedad} and score {predicted_prob_enfermedad}; {predicted_class_especie} and score {predicted_prob_especie}")
         else:
             print("No jobs found, retrying...")
 

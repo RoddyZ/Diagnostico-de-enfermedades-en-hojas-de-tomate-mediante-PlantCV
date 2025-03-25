@@ -150,3 +150,5 @@ dataset_clean_augmentation/*
 dataset_augmentation/*
 caracteristicas.csv
 runs/*
+model/full_model.h5
+model/weights.28-0.02.hdf5

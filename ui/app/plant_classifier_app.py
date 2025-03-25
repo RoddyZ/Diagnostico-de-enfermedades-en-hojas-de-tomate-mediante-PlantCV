@@ -17,7 +17,7 @@ def login(username: str, password: str) -> Optional[str]:
     Returns:
         Optional[str]: token if login is successful, None otherwise
     """
-    # TODO: Implement the login function
+
     # Steps to Build the `login` Function:
     #  1. Construct the API endpoint URL using `API_BASE_URL` and `/login`.
     #  2. Set up the request headers with `accept: application/json` and
@@ -80,7 +80,6 @@ def predict(token: str, uploaded_file: Image) -> requests.Response:
     Returns:
         requests.Response: response from the API
     """
-    # TODO: Implement the predict function
     # Steps to Build the `predict` Function:
     #  1. Create a dictionary with the file data. The file should be a
     #     tuple with the file name and the file content.
@@ -113,7 +112,7 @@ def predict(token: str, uploaded_file: Image) -> requests.Response:
         return response
 
     except requests.RequestException as e:
-        st.error(f"An error occurred while making the prediction: {e}")
+        st.error(f"An error occurred while making the predicted_class_enfermedad: {e}")
         return None
 
 
@@ -163,15 +162,17 @@ if "token" in st.session_state:
             response = predict(token, uploaded_file)
             if response.status_code == 200:
                 result = response.json()
-                prediction = result['prediction']
-                score = result['score'] * 100  # Convertir a porcentaje
+                predicted_class_enfermedad = result['predicted_class_enfermedad']
+                predicted_prob_enfermedad  = result['predicted_prob_enfermedad'] * 100  # Convertir a porcentaje
+                predicted_class_especie    = result['predicted_class_especie']
+                predicted_prob_especie     = result['predicted_prob_especie'] * 100  # Convertir a porcentaje
 
-                if prediction == "Healthy":
-                    st.write("**La planta está sana**")
+                if predicted_class_enfermedad == "Healthy" or predicted_class_enfermedad == "healthy":
+                    st.write(f"**La planta {predicted_class_especie} está sana**")
                 else:
-                    st.write(f"**La planta tiene la enfermedad :** {prediction}")
+                    st.write(f"**La planta {predicted_class_especie} tiene la enfermedad :** {predicted_class_enfermedad}")
 
-                st.write(f"**Con un nivel de certeza de :** {score:.2f}%")  # Mostrar con dos decimales
+                st.write(f"**Con un nivel de certeza de : Enfermedad:** {predicted_prob_enfermedad:.2f}%; **Especie:** {predicted_prob_especie:.2f}%")  # Mostrar con dos decimales
                 st.session_state.classification_done = True
                 st.session_state.result = result
             else:
