@@ -15,7 +15,7 @@ DISEASE_CLASSES = [
     'Cherry_including_sour_healthy',
     'Cherry_including_sour_Powdery_mildew',
     'Corn_maize_Cercospora_leaf_spot_Gray_leaf_spot',
-    'Corn_maize_Common_rust_',
+    'Corn_maize_Common_rust',
     'Corn_maize_healthy',
     'Corn_maize_Northern_Leaf_Blight',
     'Grape_Black_rot',
@@ -46,6 +46,107 @@ DISEASE_CLASSES = [
     'Tomato_Tomato_mosaic_virus',
     'Tomato_Tomato_Yellow_Leaf_Curl_Virus'
 ]
+
+# Diccionarios de traducción
+PLANT_TRANSLATIONS = {
+    'Apple': 'Manzano',
+    'Blueberry': 'Arándano',
+    'Cherry': 'Cerezo',
+    'Corn': 'Maíz',
+    'Grape': 'Vid/Uva',
+    'Orange': 'Naranjo',
+    'Peach': 'Melocotonero',
+    'Pepper': 'Pimiento',
+    'Potato': 'Papa/Patata',
+    'Raspberry': 'Frambuesa',
+    'Soybean': 'Soja',
+    'Squash': 'Calabaza',
+    'Strawberry': 'Fresa',
+    'Tomato': 'Tomate'
+}
+
+DISEASE_TRANSLATIONS = {
+    'Apple_scab'                          : 'Sarna de la manzana',
+    'Black_rot'                           : 'Pudrición negra',
+    'Cedar_apple_rust'                    : 'Roya del manzano cedro',
+    'Apple_healthy'                             : 'Manzana sana',
+    'Blueberry_healthy'                         : 'Arándano sano',
+    'Cherry_including_sour_healthy'             : 'Cereza sana',
+    'Cherry_including_sour_Powdery_mildew'      : 'Cereza Mildiu polvoriento',
+    'Corn_maize_Cercospora_leaf_spot_Gray_leaf_spot': 'Maíz mancha foliar por Cercospora mancha gris de la hoja',
+    'Corn_maize_Common_rust'                    : 'Maíz roya común',
+    'Corn_maize_healthy'                        : 'Maíz sano',
+    'Corn_maize_Northern_Leaf_Blight'           : 'Maíz tizón norteño de la hoja',
+    'Grape_Black_rot'                           : 'Uva pudrición negra',
+    'Grape_Esca_Black_Measles'                  : 'Uva Esca sarampión negro',
+    'Grape_healthy'                             : 'Uva sana',
+    'Grape_Leaf_blight_Isariopsis_Leaf_Spot'     : 'Uva tizón de la hoja mancha foliar por Isariopsis',
+    'Orange_Haunglongbing_Citrus_greening'       : 'Naranja Huanglongbing enverdecimiento de los cítricos',
+    'Peach_Bacterial_spot'                      : 'Melocotón mancha bacteriana',
+    'Peach_healthy'                             : 'Melocotón sano',
+    'Pepper_bell_Bacterial_spot'                : 'Pimiento mancha bacteriana',
+    'Pepper_bell_healthy'                       : 'Pimiento sano',
+    'Potato_Early_blight'                       : 'Papa tizón temprano',
+    'Potato_healthy'                            : 'Papa sana',
+    'Potato_Late_blight'                        : 'Papa tizón tardío',
+    'Raspberry_healthy'                         : 'Frambuesa sana',
+    'Soybean_healthy'                           : 'Soja sana',
+    'Squash_Powdery_mildew'                     : 'Calabaza Mildiu polvoriento',
+    'Strawberry_healthy'                        : 'Fresa sana',
+    'Strawberry_Leaf_scorch'                    : 'Fresa quemadura de la hoja',
+    'Tomato_Bacterial_spot'                     : 'Tomate mancha bacteriana',
+    'Tomato_Early_blight'                       : 'Tomate tizón temprano',
+    'Tomato_healthy'                            : 'Tomate sano',
+    'Tomato_Late_blight'                        : 'Tomate tizón tardío',
+    'Tomato_Leaf_Mold'                          : 'Tomate moho de la hoja',
+    'Tomato_Septoria_leaf_spot'                 : 'Tomate mancha foliar por Septoria',
+    'Tomato_Spider_mites_Two-spotted_spider_mite': 'Tomate ácaros araña araña roja de dos puntos',
+    'Tomato_Target_Spot'                        : 'Tomate mancha objetivo',
+    'Tomato_mosaic_virus'                : 'Virus del mosaico del tomate',
+    'Tomato_Yellow_Leaf_Curl_Virus'      : 'Virus del enrollamiento amarillo de la hoja del tomate'
+}
+
+
+#DISEASE_TRANSLATIONS = {
+#    'Apple_Apple_scab'                          : 'Sarna de la manzana',
+#    'Apple_Black_rot'                           : 'Pudrición negra',
+#    'Apple_Cedar_apple_rust'                    : 'Roya del manzano cedro',
+#    'Apple_healthy'                             : 'Manzana sana',
+#    'Blueberry_healthy'                         : 'Arándano sano',
+#    'Cherry_including_sour_healthy'             : 'Cereza sana',
+#    'Cherry_including_sour_Powdery_mildew'      : 'Cereza Mildiu polvoriento',
+#    'Corn_maize_Cercospora_leaf_spot_Gray_leaf_spot': 'Maíz mancha foliar por Cercospora mancha gris de la hoja',
+#    'Corn_maize_Common_rust'                    : 'Maíz roya común',
+#    'Corn_maize_healthy'                        : 'Maíz sano',
+#    'Corn_maize_Northern_Leaf_Blight'           : 'Maíz tizón norteño de la hoja',
+#    'Grape_Black_rot'                           : 'Uva pudrición negra',
+#    'Grape_Esca_Black_Measles'                  : 'Uva Esca sarampión negro',
+#    'Grape_healthy'                             : 'Uva sana',
+#    'Grape_Leaf_blight_Isariopsis_Leaf_Spot'     : 'Uva tizón de la hoja mancha foliar por Isariopsis',
+#    'Orange_Haunglongbing_Citrus_greening'       : 'Naranja Huanglongbing enverdecimiento de los cítricos',
+#    'Peach_Bacterial_spot'                      : 'Melocotón mancha bacteriana',
+#    'Peach_healthy'                             : 'Melocotón sano',
+#    'Pepper_bell_Bacterial_spot'                : 'Pimiento mancha bacteriana',
+#    'Pepper_bell_healthy'                       : 'Pimiento sano',
+#    'Potato_Early_blight'                       : 'Papa tizón temprano',
+#    'Potato_healthy'                            : 'Papa sana',
+#    'Potato_Late_blight'                        : 'Papa tizón tardío',
+#    'Raspberry_healthy'                         : 'Frambuesa sana',
+#    'Soybean_healthy'                           : 'Soja sana',
+#    'Squash_Powdery_mildew'                     : 'Calabaza Mildiu polvoriento',
+#    'Strawberry_healthy'                        : 'Fresa sana',
+#    'Strawberry_Leaf_scorch'                    : 'Fresa quemadura de la hoja',
+#    'Tomato_Bacterial_spot'                     : 'Tomate mancha bacteriana',
+#    'Tomato_Early_blight'                       : 'Tomate tizón temprano',
+#    'Tomato_healthy'                            : 'Tomate sano',
+#    'Tomato_Late_blight'                        : 'Tomate tizón tardío',
+#    'Tomato_Leaf_Mold'                          : 'Tomate moho de la hoja',
+#    'Tomato_Septoria_leaf_spot'                 : 'Tomate mancha foliar por Septoria',
+#    'Tomato_Spider_mites_Two-spotted_spider_mite': 'Tomate ácaros araña araña roja de dos puntos',
+#    'Tomato_Target_Spot'                        : 'Tomate mancha objetivo',
+#    'Tomato_Tomato_mosaic_virus'                : 'Virus del mosaico del tomate',
+#    'Tomato_Tomato_Yellow_Leaf_Curl_Virus'      : 'Virus del enrollamiento amarillo de la hoja del tomate'
+#}
 
 PLANT_CLASSES = sorted(list(set([name.split('_')[0] for name in DISEASE_CLASSES])))
 
@@ -110,8 +211,17 @@ class PlantDiseasePredictor:
 
         # Obtener el nombre y la probabilidad de la predicción de planta
         predicted_plant_name = self.plant_classes[predicted_plant_index]
+        # Traducir a español
+        translated_plant = PLANT_TRANSLATIONS.get(predicted_plant_name, predicted_plant_name)
+        translated_disease = DISEASE_TRANSLATIONS.get(disease_name, disease_name)
+        
+        # Si la planta está sana, ajustar la frase
+        if disease_name == 'healthy':
+            translated_disease = f"{translated_plant} sano"
+        else:
+            translated_disease = f"{translated_disease} en {translated_plant}"
 
-        return disease_name, float(disease_probs[predicted_disease_index]), predicted_plant_name,float(plant_probs[predicted_plant_index])
+        return translated_disease,float(disease_probs[predicted_disease_index]),translated_plant, float(plant_probs[predicted_plant_index])
         
 
 def load_predictor(model_path='./full_model.h5',
