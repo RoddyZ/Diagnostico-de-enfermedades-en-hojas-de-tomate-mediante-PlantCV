@@ -5,6 +5,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
 
+#Corn_maize_Common_rust_
 # Clases completas basadas en tu dataset
 DISEASE_CLASSES = [
     'Apple_Apple_scab',
@@ -15,7 +16,7 @@ DISEASE_CLASSES = [
     'Cherry_including_sour_healthy',
     'Cherry_including_sour_Powdery_mildew',
     'Corn_maize_Cercospora_leaf_spot_Gray_leaf_spot',
-    'Corn_maize_Common_rust_',
+    'Corn_maize_Common_rust',
     'Corn_maize_healthy',
     'Corn_maize_Northern_Leaf_Blight',
     'Grape_Black_rot',
