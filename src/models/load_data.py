@@ -4,7 +4,7 @@ from tensorflow.keras.applications.efficientnet import preprocess_input
 import os
 
 def cargar_generadores_personalizados(input_directory="dataset_clean_augmentation", img_size=(256, 256), batch_size=32):
-    """Carga generadores de datos personalizados para múltiples salidas."""
+    """Carga generadores de datos personalizados para múltiples salidas e imprime las clases de enfermedades."""
 
     TRAIN_DIR = os.path.join(input_directory, "train")
     VALID_DIR = os.path.join(input_directory, "valid")
@@ -38,12 +38,17 @@ def cargar_generadores_personalizados(input_directory="dataset_clean_augmentatio
     valid_gen_multisalida = generador_multisalida(valid_generator)
     test_gen_multisalida = generador_multisalida(test_generator)
 
-    print(f"📌 Clases de Enfermedades: {num_classes_disease}")
-    print(f"📌 Clases de Plantas: {num_classes_plant}")
-    print(f"🌱 Tipos de plantas: {plant_classes}")
+    print(f"📌 Clases de Enfermedades ({num_classes_disease}):")
+    for disease_class in disease_classes:
+        print(f"   - {disease_class}")
+
+    print(f"\n📌 Clases de Plantas ({num_classes_plant}):")
+    for plant_class in plant_classes:
+        print(f"   - {plant_class}")
+
+    print(f"\n🌱 Tipos de plantas: {plant_classes}")
 
     return train_gen_multisalida, valid_gen_multisalida, test_gen_multisalida, num_classes_disease, num_classes_plant, plant_classes, train_generator.samples, valid_generator.samples, test_generator.samples
-
 
 
 def cargar_generadores_efficientnet(input_directory="dataset_clean_augmentation", img_size=(256, 256), batch_size=32):
