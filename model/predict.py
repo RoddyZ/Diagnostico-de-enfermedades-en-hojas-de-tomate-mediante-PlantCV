@@ -71,7 +71,7 @@ DISEASE_TRANSLATIONS = {
     'Cedar_apple_rust'                    : 'Roya del manzano cedro',
     'Apple_healthy'                             : 'Manzana sana',
     'Blueberry_healthy'                         : 'Arándano sano',
-    'Cherry_including_sour_healthy'             : 'Cereza sana',
+    'including_sour_healthy'             : 'Cereza sana', #ojo quue la esta confudiendo con la de abajo
     'Cherry_including_sour_Powdery_mildew'      : 'Cereza Mildiu polvoriento',
     'Corn_maize_Cercospora_leaf_spot_Gray_leaf_spot': 'Maíz mancha foliar por Cercospora mancha gris de la hoja',
     'Corn_maize_Common_rust'                    : 'Maíz roya común',
