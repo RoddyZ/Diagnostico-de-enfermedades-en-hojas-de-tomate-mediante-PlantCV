@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
 
 def construir_modelo_googlenet(num_classes_disease, num_classes_plant, capas_congeladas=20, dropout=0.5):
     """Construye un modelo basado en GoogleNet (InceptionV3) con dos salidas."""
-    
+
     base_model = InceptionV3(weights="imagenet", include_top=False, input_shape=(256, 256, 3))
 
     # Congelar las primeras capas
@@ -25,3 +25,4 @@ def construir_modelo_googlenet(num_classes_disease, num_classes_plant, capas_con
     model = Model(inputs=base_model.input, outputs={"disease_output": disease_output, "plant_output": plant_output})
 
     return model
+
