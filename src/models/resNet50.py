@@ -33,7 +33,7 @@ def construir_modelo_multisalida(num_classes_disease, num_classes_plant, input_s
 
 def construir_modelo_multisalida_v2(num_classes_disease, num_classes_plant, input_shape=(256, 256, 3)):
     """Construye un modelo ResNet50 mejorado con múltiples salidas."""
-    
+
     # Capa de entrada
     input_tensor = Input(shape=input_shape)
 
