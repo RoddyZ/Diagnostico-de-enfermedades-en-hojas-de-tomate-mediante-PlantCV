@@ -118,9 +118,9 @@ def predict(token: str, uploaded_file: Image) -> requests.Response:
 
 
 # Interfaz de usuario
-st.set_page_config(page_title="Predictor Enfermedades", page_icon="📷")
+st.set_page_config(page_title="Predictor Enfermedades y Especies", page_icon="📷")
 st.markdown(
-    "<h1 style='text-align: center; color: #4B89DC;'>Predictor Enfermedades</h1>",
+    "<h1 style='text-align: center; color: #4B89DC;'>Predictor Enfermedades y Especies</h1>",
     unsafe_allow_html=True,
 )
 
@@ -184,6 +184,6 @@ if "token" in st.session_state:
     # Pie de página
     st.markdown("<hr style='border:2px solid #4B89DC;'>", unsafe_allow_html=True)
     st.markdown(
-        "<p style='text-align: center; color: #4B89DC;'>2025 Predictor Enfermedades App</p>",
+        "<p style='text-align: center; color: #4B89DC;'>2025 Predictor Enfermedades y Especies App</p>",
         unsafe_allow_html=True,
     )
