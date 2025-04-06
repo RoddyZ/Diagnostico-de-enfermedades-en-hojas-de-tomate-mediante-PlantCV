@@ -53,11 +53,11 @@ PLANT_TRANSLATIONS = {
     'Blueberry': 'Arándano',
     'Cherry': 'Cerezo',
     'Corn': 'Maíz',
-    'Grape': 'Vid/Uva',
+    'Grape': 'Uva',
     'Orange': 'Naranjo',
-    'Peach': 'Melocotonero',
+    'Peach': 'Durazno',
     'Pepper': 'Pimiento',
-    'Potato': 'Papa/Patata',
+    'Potato': 'Papa',
     'Raspberry': 'Frambuesa',
     'Soybean': 'Soja',
     'Squash': 'Calabaza',
@@ -67,44 +67,44 @@ PLANT_TRANSLATIONS = {
 
 
 DISEASE_TRANSLATIONS = {
-    'Apple_scab'                                : 'Sarna de la manzana',
-    'Black_rot'                                 : 'Pudrición negra',
-    'Cedar_apple_rust'                          : 'Roya del manzano cedro',
+    'Apple_scab'                                : 'Sarna',
+    'Black_rot'                                 : 'la Pudrición negra',
+    'Cedar_apple_rust'                          : 'la Roya del Manzano y del Cedro',
     'Apple_healthy'                             : 'Manzana sana',
     'Blueberry_healthy'                         : 'Arándano sano',
     'including_sour_healthy'                    : 'Cereza sana',
-    'including_sour_Powdery_mildew'             : 'Cereza Mildiu polvoriento',
-    'maize_Cercospora_leaf_spot_Gray_leaf_spot' : 'Maíz mancha foliar por Cercospora mancha gris de la hoja',
-    'maize_Common_rust'                         : 'Maíz roya común',
+    'including_sour_Powdery_mildew'             : 'Mildiu Polvoriento Ácido',
+    'maize_Cercospora_leaf_spot_Gray_leaf_spot' : 'la Mancha Foliar de Cercospora (Mancha Gris de la Hoja)',
+    'maize_Common_rust'                         : 'la Roya común',
     'maize_healthy'                             : 'Maíz sano',
-    'maize_Northern_Leaf_Blight'                : 'Maíz tizón norteño de la hoja',
-    'Grape_Black_rot'                           : 'Uva pudrición negra',
-    'Esca_Black_Measles'                        : 'Uva Esca sarampión negro',
+    'maize_Northern_Leaf_Blight'                : 'Tizón del norte',
+    'Grape_Black_rot'                           : 'la Pudrición negra',
+    'Esca_Black_Measles'                        : 'Esca (sarampión negro)',
     'Grape_healthy'                             : 'Uva sana',
-    'Leaf_blight_Isariopsis_Leaf_Spot'          : 'Uva tizón de la hoja mancha foliar por Isariopsis',
-    'Haunglongbing_Citrus_greening'             : 'Naranja Huanglongbing enverdecimiento de los cítricos',
-    'Bacterial_spot'                            : 'Melocotón mancha bacteriana',
+    'Leaf_blight_Isariopsis_Leaf_Spot'          : 'la Mancha Foliar por Isariopsis',
+    'Haunglongbing_Citrus_greening'             : 'Huanglongbing (enverdecimiento de los cítricos)',
+    'Bacterial_spot'                            : 'la Mancha bacteriana',
     'Peach_healthy'                             : 'Melocotón sano',
-    'bell_Bacterial_spot'                       : 'Pimiento mancha bacteriana',
+    'bell_Bacterial_spot'                       : 'la Mancha bacteriana',
     'bell_healthy'                              : 'Pimiento sano',
-    'Early_blight'                              : 'Papa tizón temprano',
+    'Early_blight'                              : 'Tizón temprano',
     'Potato_healthy'                            : 'Papa sana',
-    'Late_blight'                               : 'Papa tizón tardío',
+    'Late_blight'                               : 'Tizón tardío',
     'Raspberry_healthy'                         : 'Frambuesa sana',
     'Soybean_healthy'                           : 'Soja sana',
-    'Powdery_mildew'                            : 'Calabaza Mildiu polvoriento',
+    'Powdery_mildew'                            : 'Mildiu polvoriento',
     'Strawberry_healthy'                        : 'Fresa sana',
-    'Leaf_scorch'                               : 'Fresa quemadura de la hoja',
-    'Bacterial_spot'                            : 'Tomate mancha bacteriana',
-    'Early_blight'                              : 'Tomate tizón temprano',
+    'Leaf_scorch'                               : 'la Quemadura de la hoja',
+    'Bacterial_spot'                            : 'la Mancha bacteriana',
+    'Early_blight'                              : 'Tizón temprano',
     'Tomato_healthy'                            : 'Tomate sano',
-    'Late_blight'                               : 'Tomate tizón tardío',
-    'Leaf_Mold'                                 : 'Tomate moho de la hoja',
-    'Septoria_leaf_spot'                        : 'Tomate mancha foliar por Septoria',
-    'Spider_mites_Two-spotted_spider_mite'      : 'Tomate ácaros araña araña roja de dos puntos',
-    'Target_Spot'                               : 'Tomate mancha objetivo',
-    'Tomato_mosaic_virus'                       : 'Virus del mosaico del tomate',
-    'Tomato_Yellow_Leaf_Curl_Virus'             : 'Virus del enrollamiento amarillo de la hoja del tomate'
+    'Late_blight'                               : 'Tizón tardío',
+    'Leaf_Mold'                                 : 'Moho',
+    'Septoria_leaf_spot'                        : 'la Mancha foliar por Septoria',
+    'Spider_mites_Two-spotted_spider_mite'      : 'Ácaros araña (ácaro araña de dos manchas)',
+    'Target_Spot'                               : 'la Mancha Objetivo',
+    'Tomato_mosaic_virus'                       : 'el Virus del mosaico',
+    'Tomato_Yellow_Leaf_Curl_Virus'             : 'el Virus del Rizado Amarillo'
 }
 
 PLANT_CLASSES = sorted(list(set([name.split('_')[0] for name in DISEASE_CLASSES])))
@@ -113,7 +113,7 @@ class PlantDiseasePredictor:
     def __init__(self, model_path, weights_path):
         """
         Carga el modelo ResNet50 con los pesos pre-entrenados.
-        
+
         Args:
             model_path: Ruta al archivo .h5 del modelo completo
             weights_path: Ruta al archivo .hdf5 con los pesos
@@ -127,10 +127,10 @@ class PlantDiseasePredictor:
     def preprocess_image(self, img_path):
         """
         Preprocesa una imagen para que sea compatible con el modelo.
-        
+
         Args:
             img_path: Ruta a la imagen a predecir
-            
+
         Returns:
             Imagen preprocesada como numpy array
         """
@@ -144,10 +144,10 @@ class PlantDiseasePredictor:
         """
         Realiza la predicción de enfermedad y especie de planta,
         devolviendo solo la predicción con la probabilidad más alta.
-        
+
         Args:
             img_path: Ruta a la imagen a predecir
-            
+
         Returns:
             dict: Diccionario con las predicciones y probabilidades más altas.
         """
@@ -173,7 +173,7 @@ class PlantDiseasePredictor:
         # Traducir a español
         translated_plant = PLANT_TRANSLATIONS.get(predicted_plant_name, predicted_plant_name)
         translated_disease = DISEASE_TRANSLATIONS.get(disease_name, disease_name)
-        
+
         # Si la planta está sana, ajustar la frase
         if disease_name == 'healthy':
             translated_disease = f"{translated_plant} sano"
@@ -181,12 +181,12 @@ class PlantDiseasePredictor:
             translated_disease = f"{translated_disease}"
 
         return translated_disease, float(disease_probs[predicted_disease_index]), translated_plant, float(plant_probs[predicted_plant_index])
-        
+
 def load_predictor(model_path='./full_model.h5',
                     weights_path='./weights.28-0.02.hdf5'):
     """
     Carga el predictor para usar desde notebook.
-    
+
     Returns:
         Objeto PlantDiseasePredictor configurado
     """
@@ -195,5 +195,5 @@ def load_predictor(model_path='./full_model.h5',
         raise FileNotFoundError(f"No se encontró el modelo en {model_path}")
     if not os.path.exists(weights_path):
         raise FileNotFoundError(f"No se encontraron los pesos en {weights_path}")
-    
+
     return PlantDiseasePredictor(model_path, weights_path)

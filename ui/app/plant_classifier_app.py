@@ -167,13 +167,13 @@ if "token" in st.session_state:
                 predicted_class_especie    = result['predicted_class_especie']
                 predicted_prob_especie     = result['predicted_prob_especie'] * 100  # Convertir a porcentaje
 
-                if predicted_class_enfermedad == "Healthy" or predicted_class_enfermedad == "healthy":
-                    st.write(f"**La planta {predicted_class_especie} está sana**")
+                if "sana" in predicted_class_enfermedad.lower() or "sano" in predicted_class_enfermedad.lower() or predicted_class_enfermedad == "Healthy" or predicted_class_enfermedad == "healthy":
+                    st.write(f"La planta de **{predicted_class_especie}** está **sana**")
                 else:
-                    st.write(f"**La planta {predicted_class_especie} tiene la enfermedad :** {predicted_class_enfermedad}")
+                    st.write(f"La planta de **{predicted_class_especie}** está enferma de **{predicted_class_enfermedad}**")
 
-                st.write(f"Con un nivel de certeza de : ")  # Mostrar con dos decimales
-                st.write(f"Enfermedad:** {predicted_prob_enfermedad:.2f}%; **Especie: {predicted_prob_especie:.2f}%")
+                st.write(f"Con un nivel de certeza de : ")
+                st.write(f"Enfermedad: **{predicted_prob_enfermedad:.2f}%**;   Especie: **{predicted_prob_especie:.2f}%**")
                 st.session_state.classification_done = True
                 st.session_state.result = result
             else:
