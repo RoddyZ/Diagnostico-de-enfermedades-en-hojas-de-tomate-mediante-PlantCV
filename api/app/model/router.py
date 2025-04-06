@@ -12,7 +12,6 @@ from sqlalchemy.orm import Session
 
 router = APIRouter(tags=["Model"], prefix="/model")
 
-
 @router.post("/predict")
 async def predict(file: UploadFile, current_user=Depends(get_current_user)):
     rpse = {"success": False, "predicted_class_enfermedad": None, "predicted_prob_enfermedad": None,
@@ -61,7 +60,7 @@ async def predict(file: UploadFile, current_user=Depends(get_current_user)):
         rpse["predicted_class_especie"]    = predicted_class_especie
         rpse["predicted_prob_especie"]     = predicted_prob_especie
         rpse["image_file_name"] = file_hash
-        print("diccionario ",rpse) 
+        print("diccionario ",rpse)
 
     except Exception as e:
         raise HTTPException(
