@@ -87,6 +87,14 @@ def cargar_generadores_efficientnet(input_directory="dataset_clean_augmentation"
     valid_gen_multisalida = generador_multisalida(valid_generator)
     test_gen_multisalida = generador_multisalida(test_generator)
 
+    print(f"📌 Clases de Enfermedades ({num_classes_disease}):")
+    for disease_class in disease_classes:
+        print(f"   - {disease_class}")
+
+    print(f"\n📌 Clases de Plantas ({num_classes_plant}):")
+    for plant_class in plant_classes:
+        print(f"   - {plant_class}")
+    
     print(f"📌 Clases de Enfermedades: {num_classes_disease}")
     print(f"📌 Clases de Plantas: {num_classes_plant}")
     print(f"🌱 Tipos de plantas: {plant_classes}")
