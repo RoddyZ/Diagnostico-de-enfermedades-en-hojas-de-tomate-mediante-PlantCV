@@ -25,9 +25,15 @@ except redis.ConnectionError as e:
 
 model_path='./full_model.h5'
 weights_path = "./weights.28-0.02.hdf5"
+model_type = 'resnet'
+
+#model_type = 'EfficentNet'
+#model_path=''
+#weights_path = "./weights.26-0.02.hdf5"
+
 
 # Cargar el predictor
-predictor = load_predictor(model_path = model_path, weights_path = weights_path)
+predictor = load_predictor(model_type = model_type, model_path = model_path, weights_path = weights_path)
 
 def predict(image_name):
     """
