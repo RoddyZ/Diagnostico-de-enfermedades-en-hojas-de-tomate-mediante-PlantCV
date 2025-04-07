@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
+from EfficientNetB3 import construir_modelo_efficientnet
 
 # Clases completas basadas en tu dataset (orden correcto)
 DISEASE_CLASSES = [
@@ -110,7 +111,7 @@ DISEASE_TRANSLATIONS = {
 PLANT_CLASSES = sorted(list(set([name.split('_')[0] for name in DISEASE_CLASSES])))
 
 class PlantDiseasePredictor:
-    def __init__(self, model_path, weights_path):
+    def __init__(self,model_type, model_path, weights_path):
         """
         Carga el modelo ResNet50 con los pesos pre-entrenados.
 
@@ -118,11 +119,28 @@ class PlantDiseasePredictor:
             model_path: Ruta al archivo .h5 del modelo completo
             weights_path: Ruta al archivo .hdf5 con los pesos
         """
-        self.model = load_model(model_path)
-        self.model.load_weights(weights_path)
-        self.img_size = (256, 256)  # Tamaño usado en el entrenamiento
-        self.disease_classes = DISEASE_CLASSES
-        self.plant_classes = PLANT_CLASSES
+        if model_type == 'resnet':
+            self.model = load_model(model_path)
+            self.model.load_weights(weights_path)
+            self.img_size = (256, 256)  # Tamaño usado en el entrenamiento
+            self.disease_classes = DISEASE_CLASSES
+            self.plant_classes = PLANT_CLASSES
+        else:
+            # Parámetros usados en entrenamiento
+            num_classes_disease = len(DISEASE_CLASSES)
+            num_classes_plant = len(PLANT_CLASSES)
+            input_shape = (256, 256, 3)
+
+            # Reconstruir el modelo
+            self.model = construir_modelo_efficientnet(num_classes_disease, num_classes_plant, input_shape)
+
+            # Cargar pesos
+            self.model.load_weights(weights_path)
+
+            self.img_size = (256, 256)
+            self.disease_classes = DISEASE_CLASSES
+            self.plant_classes = PLANT_CLASSES
+
 
     def preprocess_image(self, img_path):
         """
@@ -182,18 +200,25 @@ class PlantDiseasePredictor:
 
         return translated_disease, float(disease_probs[predicted_disease_index]), translated_plant, float(plant_probs[predicted_plant_index])
 
-def load_predictor(model_path='./full_model.h5',
+def load_predictor(model_type = 'resnet', model_path='./full_model.h5',
                     weights_path='./weights.28-0.02.hdf5'):
     """
     Carga el predictor para usar desde notebook.
+    Para Resnet:
+    model_type = 'resnet', model_path='./full_model.h5',
+                    weights_path='./weights.28-0.02.hdf5'
+
+    Para EfficentNet:
+    model_type = 'EfficentNet', model_path='',
+                    weights_path='./weights.26-0.02.hdf5'
 
     Returns:
         Objeto PlantDiseasePredictor configurado
     """
     # Verificar que los archivos existan
-    if not os.path.exists(model_path):
+    if not os.path.exists(model_path) and model_type == 'resnet':
         raise FileNotFoundError(f"No se encontró el modelo en {model_path}")
     if not os.path.exists(weights_path):
         raise FileNotFoundError(f"No se encontraron los pesos en {weights_path}")
 
-    return PlantDiseasePredictor(model_path, weights_path)
+    return PlantDiseasePredictor(model_type, model_path, weights_path)
