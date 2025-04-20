@@ -153,3 +153,4 @@ runs/*
 model/full_model.h5
 model/weights.28-0.02.hdf5
 model/*.hdf5
+dataset_augmentation_merge/*
