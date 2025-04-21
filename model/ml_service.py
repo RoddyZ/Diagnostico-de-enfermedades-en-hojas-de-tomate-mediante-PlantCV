@@ -29,7 +29,7 @@ model_type = 'resnet'
 
 #model_type = 'EfficentNet'
 #model_path=''
-#weights_path = "./weights.26-0.02.hdf5"
+#weights_path = "./weights.21-0.03.hdf5"
 
 
 # Cargar el predictor
